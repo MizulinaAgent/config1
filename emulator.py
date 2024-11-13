@@ -1,4 +1,5 @@
 import argparse
+import os
 import zipfile
 
 
@@ -31,6 +32,13 @@ def run_shell(username, zip_path):
                     list_directory(current_path, zip_file)
                 else:
                     print("ls: аргументы не поддерживаются")
+            elif cmd == 'cd':
+                if len(command) == 2:
+                    current_path = change_directory(current_path, command[1], zip_file)
+                elif len(command) == 1:
+                    print("cd: отсутствует аргумент")
+                else:
+                    print("cd: слишком много аргументов")
 
 def exit_shell():
     exit(0)
@@ -50,3 +58,28 @@ def list_directory(current_path, zip_file):
 
     for item in sorted(items_in_current_path):
         print(item)
+
+def change_directory(current_path, target_directory, zip_file):
+    if target_directory == "/":
+        return "/root"
+    if target_directory.startswith("/"):
+        new_dir = "/root"
+    else:
+        new_dir = current_path
+    parts = target_directory.split('/')
+    for part in parts:
+        if part == '' or part == '.':
+            continue
+        elif part == "..":
+            if new_dir != "/root":
+                new_dir = "/".join(new_dir.strip('/').split('/')[:-1])
+                if not new_dir:
+                    new_dir = "/root"
+        else:
+            new_dir = os.path.join(new_dir, part).replace("\\", "/").strip('/')
+
+    if any(f.startswith(new_dir + '/') for f in zip_file.namelist()):
+        return "/" + new_dir if not new_dir.startswith("/") else new_dir
+    else:
+        print(f"cd: нет такого файла или каталога: {target_directory}")
+        return current_path
