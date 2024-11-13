@@ -52,6 +52,11 @@ def run_shell(username, zip_path):
                     show_calendar()
                 else:
                     print("cal: аргументы не поддерживаются")
+            elif cmd == 'whoami':
+                if len(command) == 1:
+                    print(username)
+                else:
+                    print("whoami: аргументы не поддерживаются")
             else:
                 print(f"{cmd}: команда не найдена")
 
