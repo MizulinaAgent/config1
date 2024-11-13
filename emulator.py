@@ -26,6 +26,27 @@ def run_shell(username, zip_path):
             cmd = command[0]
             if cmd == 'exit':
                 exit_shell()
+            elif cmd == 'ls':
+                if len(command) == 1:
+                    list_directory(current_path, zip_file)
+                else:
+                    print("ls: аргументы не поддерживаются")
 
 def exit_shell():
     exit(0)
+
+def list_directory(current_path, zip_file):
+    current_path = current_path.strip('/')
+    current_path_len = len(current_path)
+    items_in_current_path = set()
+
+    for file in zip_file.namelist():
+        if file.startswith(current_path):
+            relative_path = file[current_path_len:].lstrip('/')
+            if relative_path and '/' not in relative_path:
+                items_in_current_path.add(relative_path)
+            elif '/' in relative_path:
+                items_in_current_path.add(relative_path.split('/')[0] + '/')
+
+    for item in sorted(items_in_current_path):
+        print(item)
