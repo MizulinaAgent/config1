@@ -125,3 +125,13 @@ def show_calendar():
     now = datetime.datetime.now()
     cal = calendar.month(now.year, now.month)
     print(cal)
+
+def main():
+    args = parse_args()
+    if not os.path.exists(args.zip):
+        print(f"zip файл {args.zip} не существует")
+        exit(1)
+    run_shell(args.user, args.zip)
+
+if __name__ == "__main__":
+    main()
