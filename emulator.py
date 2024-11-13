@@ -39,6 +39,15 @@ def run_shell(username, zip_path):
                     print("cd: отсутствует аргумент")
                 else:
                     print("cd: слишком много аргументов")
+            elif cmd == 'mkdir':
+                if len(command) == 2:
+                    current_path = make_directory(current_path, command[1], zip_file)
+                    with zipfile.ZipFile('root.zip', 'r') as zip_file:
+                        zip_file.printdir()
+                else:
+                    print("mkdir: отсутствует аргумент")
+            else:
+                print(f"{cmd}: команда не найдена")
 
 def exit_shell():
     exit(0)
@@ -83,3 +92,18 @@ def change_directory(current_path, target_directory, zip_file):
     else:
         print(f"cd: нет такого файла или каталога: {target_directory}")
         return current_path
+
+def make_directory(current_path, dir_name, zip_file):
+    new_dir_path = os.path.join(current_path, dir_name).replace("\\", "/")
+    if not new_dir_path.endswith('/'):
+        new_dir_path += "/"
+
+    if any(f.startswith(new_dir_path) for f in zip_file.namelist()):
+        print(f"mkdir: не удается создать каталог '{dir_name}': файл или каталог существует")
+        return current_path
+
+    zip_file.writestr(new_dir_path, b'')
+    placeholder_file = new_dir_path + 'placeholder.txt'
+    zip_file.writestr(placeholder_file, b'')
+    print(f"Каталог '{dir_name}' с пустым файлом внутри создан.")
+    return current_path
