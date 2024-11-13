@@ -1,7 +1,8 @@
 import argparse
 import os
 import zipfile
-
+import calendar
+import datetime
 
 def prompt(username, current_path):
     home_path = "/root"
@@ -19,7 +20,7 @@ def parse_args():
 
 def run_shell(username, zip_path):
     current_path = "/root"
-    with zipfile.ZipFile(zip_path, "a") as zip_file:  # Открытие в режиме добавления для mkdir
+    with zipfile.ZipFile(zip_path, "a") as zip_file:
         while True:
             command = input(prompt(username, current_path)).strip().split()
             if not command:
@@ -46,8 +47,15 @@ def run_shell(username, zip_path):
                         zip_file.printdir()
                 else:
                     print("mkdir: отсутствует аргумент")
+            elif cmd == 'cal':
+                if len(command) == 1:
+                    show_calendar()
+                else:
+                    print("cal: аргументы не поддерживаются")
             else:
                 print(f"{cmd}: команда не найдена")
+
+
 
 def exit_shell():
     exit(0)
@@ -107,3 +115,8 @@ def make_directory(current_path, dir_name, zip_file):
     zip_file.writestr(placeholder_file, b'')
     print(f"Каталог '{dir_name}' с пустым файлом внутри создан.")
     return current_path
+
+def show_calendar():
+    now = datetime.datetime.now()
+    cal = calendar.month(now.year, now.month)
+    print(cal)
