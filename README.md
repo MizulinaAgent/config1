@@ -77,9 +77,8 @@
 
 **Тестирование mkdir**
 
-![image](https://github.com/user-attachments/assets/a38729db-76a4-422b-b606-5fa6aed9ffe7)
+![image](https://github.com/user-attachments/assets/ff6a9615-e9e1-4d76-95cc-1625a54b2e30)
 
-![image](https://github.com/user-attachments/assets/b1e16ad2-12f6-4da6-b373-06c1bf1fc4d8)
 
 
 
