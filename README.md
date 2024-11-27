@@ -56,3 +56,33 @@
 Для запуска потребуется подумать головой и написать:
 
 ***Python(py,p) emulator.py --user <имя того кто рискнул> --zip <название пакетика>***
+
+## Тестики
+
+**Тестирование ls**
+
+![image](https://github.com/user-attachments/assets/1dcecc35-dbfc-436c-810b-097f2d7fe06c)
+
+**Тестирование cd**
+
+![image](https://github.com/user-attachments/assets/9c6fd8c1-e1b3-43b6-ba28-d0c2b8524ea7)
+
+**Тестирование cal**
+
+![image](https://github.com/user-attachments/assets/59647f2e-54b9-46e9-b30f-5e11e6fbc7b8)
+
+**Тестирование whoami**
+
+![image](https://github.com/user-attachments/assets/1d268726-24ce-46df-a004-0afcd4ed4735)
+
+**Тестирование mkdir**
+
+![image](https://github.com/user-attachments/assets/a38729db-76a4-422b-b606-5fa6aed9ffe7)
+
+![image](https://github.com/user-attachments/assets/b1e16ad2-12f6-4da6-b373-06c1bf1fc4d8)
+
+
+
+
+
+
