@@ -79,6 +79,10 @@
 
 ![image](https://github.com/user-attachments/assets/ff6a9615-e9e1-4d76-95cc-1625a54b2e30)
 
+**ПРОВЕРКА ТЕСТОВ**
+
+![image](https://github.com/user-attachments/assets/be33bc42-6462-4d19-bc30-ce9be70465b5)
+
 
 
 
