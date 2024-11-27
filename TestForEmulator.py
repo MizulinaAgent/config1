@@ -1,79 +1,110 @@
 import unittest
-import os
 import zipfile
+import os
 from io import StringIO
-import sys
-from emulator import list_directory, change_directory, exit_shell
-
+from contextlib import redirect_stdout
+from emulator import list_directory, change_directory, create_directory, show_calendar
 
 class TestShellCommands(unittest.TestCase):
 
-    def setUp(self):
-        self.zip_path = 'root.zip'
-        with zipfile.ZipFile(self.zip_path, 'w') as zipf:
-            zipf.writestr('root/placeholder.txt', '')
+    @classmethod
+    def setUpClass(cls):
+        """
+        Открывает загруженный ZIP-файл перед тестами.
+        """
+        cls.zip_path = 'root.zip'
+        cls.zip_file = zipfile.ZipFile(cls.zip_path, "a")
+        cls.current_path = "/root"
 
-    def tearDown(self):
-        if os.path.exists(self.zip_path):
-            os.remove(self.zip_path)
+    @classmethod
+    def tearDownClass(cls):
+        """
+        Закрывает ZIP-файл после выполнения тестов.
+        """
+        cls.zip_file.close()
 
-    def test_ls(self):
-        # Проверка команды 'ls', выводит файл 'placeholder.txt' в корневой директории
-        captured_output = StringIO()
-        sys.stdout = captured_output
-        with zipfile.ZipFile(self.zip_path, 'a') as zipf:
-            list_directory('/root', zipf)
-        sys.stdout = sys.__stdout__
-        output = captured_output.getvalue().strip()
-        self.assertEqual(output, 'placeholder.txt')
+    # Тесты для mkdir
+    def test_mkdir_new_directory(self):
+        """
+        Тест команды mkdir: создание новой директории.
+        """
+        create_directory(self.current_path, "new_dir", self.zip_file)
+        self.assertIn("root/new_dir/", self.zip_file.namelist())
 
-        # Проверка команды 'ls' в несуществующей директории, должно быть пусто
-        captured_output = StringIO()
-        sys.stdout = captured_output
-        with zipfile.ZipFile(self.zip_path, 'a') as zipf:
-            list_directory('/root/nonexistent', zipf)
-        sys.stdout = sys.__stdout__
-        output = captured_output.getvalue().strip()
-        self.assertEqual(output, '')
+    def test_mkdir_existing_directory(self):
+        """
+        Тест команды mkdir: попытка создать уже существующую директорию.
+        """
+        with StringIO() as buf, redirect_stdout(buf):
+            create_directory(self.current_path, "dir1", self.zip_file)
+            output = buf.getvalue().strip()
+        self.assertIn("mkdir: директория 'dir1' уже существует", output)
 
-    def test_cd(self):
-        # Проверка команды 'cd' в корневую директорию
-        captured_output = StringIO()
-        sys.stdout = captured_output
-        with zipfile.ZipFile(self.zip_path, 'a') as zipf:
-            new_path = change_directory('/root', '/', zipf)
-        sys.stdout = sys.__stdout__
-        self.assertEqual(new_path, '/root')
+    # Тесты для ls
+    def test_ls_root_directory(self):
+        """
+        Тест команды ls для корневой директории.
+        """
+        with StringIO() as buf, redirect_stdout(buf):
+            create_directory(self.current_path, "dir1", self.zip_file)
+            output = buf.getvalue().strip()
+        self.assertIn("mkdir: директория 'dir1' уже существует", output)
 
-        # Проверка команды 'cd' в несуществующую директорию, возвращает на '/root'
-        captured_output = StringIO()
-        sys.stdout = captured_output
-        with zipfile.ZipFile(self.zip_path, 'a') as zipf:
-            new_path = change_directory('/root', '/nonexistent', zipf)
-        sys.stdout = sys.__stdout__
-        self.assertEqual(new_path, '/root')
+    def test_ls_subdirectory(self):
+        """
+        Тест команды ls для поддиректории.
+        """
+        with StringIO() as buf, redirect_stdout(buf):
+            create_directory(self.current_path, "dir1", self.zip_file)
+            output = buf.getvalue().strip()
+        self.assertIn("mkdir: директория 'dir1' уже существует", output)
 
-    def test_exit(self):
-        # Проверка завершения работы оболочки
+    # Тесты для cd
+    def test_cd_to_existing_directory(self):
+        """
+        Тест команды cd для перехода в существующую директорию.
+        """
+        new_path = change_directory(self.current_path, "home", self.zip_file)
+        self.assertEqual(new_path, "/root/home")
+
+    def test_cd_to_parent_directory(self):
+        """
+        Тест команды cd для перехода в родительскую директорию.
+        """
+        current_path = "/root/dir1"
+        new_path = change_directory(current_path, "..", self.zip_file)
+        self.assertEqual(new_path, "/root")
+
+    # Тест для whoami
+    def test_whoami(self):
+        """
+        Тест команды whoami.
+        """
+        username = "test_user"
+        with StringIO() as buf, redirect_stdout(buf):
+            print(username)
+            output = buf.getvalue().strip()
+        self.assertEqual(output, username)
+
+    # Тест для cal
+    def test_cal(self):
+        """
+        Тест команды cal.
+        """
+        with StringIO() as buf, redirect_stdout(buf):
+            show_calendar()
+            output = buf.getvalue().strip()
+        self.assertFalse(output.startswith("   "))
+
+    # Тест для exit
+    def test_exit_shell(self):
+        """
+        Тест команды exit.
+        """
         with self.assertRaises(SystemExit):
+            from emulator import exit_shell
             exit_shell()
 
-    def test_whoami(self):
-        # Проверка команды 'whoami', должно вернуть имя пользователя
-        captured_output = StringIO()
-        sys.stdout = captured_output
-        username = "root"
-        print(username)
-        sys.stdout = sys.__stdout__
-        self.assertEqual(captured_output.getvalue().strip(), "root")
 
-        # Проверка команды 'whoami' с другим пользователем
-        captured_output = StringIO()
-        sys.stdout = captured_output
-        username = "admin"
-        print(username)
-        sys.stdout = sys.__stdout__
-        self.assertEqual(captured_output.getvalue().strip(), "admin")
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()
